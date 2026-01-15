@@ -1,0 +1,14 @@
+{
+  "name": "hku-biz-undergrad-simulator",
+  "version": "1.0.0",
+  "description": "Web-based HKU Business School student life simulation (Prof Robin office hour) with optional DeepSeek AI backend.",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "node-fetch": "^3.3.2"
+  },
+  "type": "module"
+}

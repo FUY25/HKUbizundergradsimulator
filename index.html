@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>HKU Biz Undergrad Simulator – Prof Robin's Office Hour</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;800&family=Fredoka:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Intro Screen -->
+      <section id="intro-screen" class="screen active">
+        <div class="card intro-card">
+          <h1>HKU Biz Undergrad Simulator</h1>
+          <p class="subtitle">
+            You are a Year 3 HKU Business School finance student, sprinting to secure
+            a recommendation letter from <strong>Prof. Robin</strong> at KKL 1125.
+          </p>
+          <div class="comic-strip">
+            <div class="comic-panel">
+              <div class="comic-text">
+                “Deadline for master program application: <strong>TOMORROW</strong>.”
+              </div>
+            </div>
+            <div class="comic-panel">
+              <div class="comic-text">
+                You: “Maybe I should have gone to office hours before week 13…”
+              </div>
+            </div>
+            <div class="comic-panel">
+              <div class="comic-text">
+                Prof Robin (in KKL 1125): “Next student. I have 10 minutes only.”
+              </div>
+            </div>
+          </div>
+          <button id="intro-next-btn" class="btn primary">
+            Start Office Hour
+          </button>
+        </div>
+      </section>
+
+      <!-- Setup Screen -->
+      <section id="setup-screen" class="screen">
+        <div class="card setup-card">
+          <h2>Student Setup</h2>
+          <p class="subtitle">
+            Customize your HKU finance student. Your choices will <strong>influence</strong> – but
+            not fully determine – Prof Robin’s favorability.
+          </p>
+          <form id="setup-form">
+            <div class="form-row">
+              <label for="student-name">Your Name</label>
+              <input
+                id="student-name"
+                type="text"
+                maxlength="30"
+                placeholder="e.g. Alex Chan"
+                required
+              />
+            </div>
+
+            <div class="form-row">
+              <label for="student-year">Year of Study</label>
+              <input
+                id="student-year"
+                type="text"
+                value="Year 3 BBA (Finance)"
+                disabled
+              />
+              <span class="hint">Fixed: You are a Year 3 finance student.</span>
+            </div>
+
+            <div class="form-row inline">
+              <div>
+                <label for="student-gpa">Current Cumulative GPA</label>
+                <input
+                  id="student-gpa"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="4.3"
+                  placeholder="e.g. 3.45"
+                  required
+                />
+                <span class="hint">0.00 – 4.30 (self‑reported)</span>
+              </div>
+              <div>
+                <label for="student-attendance">Attendance Rate in Prof Robin's Course (%)</label>
+                <input
+                  id="student-attendance"
+                  type="number"
+                  min="0"
+                  max="100"
+                  placeholder="e.g. 72"
+                  required
+                />
+                <span class="hint">0 – 100% (self‑reported)</span>
+              </div>
+            </div>
+
+            <div class="form-footer">
+              <p class="small-print">
+                Prof Robin does not fully trust self‑reported numbers. Conversation
+                matters more than stats.
+              </p>
+              <button type="submit" class="btn primary">
+                Enter KKL 1125
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Game Screen -->
+      <section id="game-screen" class="screen">
+        <header class="game-header">
+          <div class="title-block">
+            <h2>KKL 1125 – Office Hour with Prof Robin</h2>
+            <p class="subtitle">
+              Rounds: <span id="round-indicator">1</span> / <span id="round-max">10</span>
+            </p>
+          </div>
+          <div class="favorability-block">
+            <div class="favorability-label">
+              Professor's Favorability
+              <span id="favorability-value">0</span>/100
+            </div>
+            <div class="favorability-bar-outer">
+              <div id="favorability-bar-inner"></div>
+            </div>
+          </div>
+          <div class="controls-block">
+            <button id="sound-toggle" class="sound-btn" aria-label="Toggle sound" title="Toggle sound">
+              <span class="sound-icon">🔊</span>
+            </button>
+            <label class="toggle">
+              <input type="checkbox" id="thought-toggle" checked />
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">Show Prof's Inner Thoughts</span>
+            </label>
+          </div>
+        </header>
+
+        <main class="game-main">
+          <div class="chat-column">
+            <div id="chat-log" class="chat-log"></div>
+            <div id="typing-indicator" class="typing-indicator hidden">
+              <div class="typing-bubbles">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+              </div>
+              <span class="typing-label">Prof Robin is thinking...</span>
+            </div>
+            <div class="chat-input-row">
+              <div class="input-wrapper">
+                <input
+                  id="chat-input"
+                  type="text"
+                  maxlength="300"
+                  placeholder="Type what you say to Prof Robin..."
+                />
+                <span id="char-counter" class="char-counter">0/300</span>
+              </div>
+              <button id="chat-send-btn" class="btn primary">Send</button>
+            </div>
+            <p class="chat-hint">
+              You have <span id="rounds-left">10</span> rounds to convince Prof Robin
+              to write you a recommendation letter.
+            </p>
+            
+            <!-- End conversation overlay -->
+            <div id="end-conversation-overlay" class="end-overlay hidden">
+              <div class="end-overlay-content">
+                <div class="end-overlay-icon">📋</div>
+                <h3 class="end-overlay-title">Office Hour Ended</h3>
+                <p class="end-overlay-subtitle">Prof Robin is ready to make his decision...</p>
+                <button id="see-results-btn" class="btn primary">
+                  <span class="btn-star">⭐</span>
+                  See Your Results
+                  <span class="btn-star">⭐</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <aside class="prof-column">
+            <div class="prof-card">
+              <div class="prof-avatar-wrapper">
+                <div class="prof-avatar">
+                  <!-- Simple CSS face; can be swapped to image later -->
+                  <div class="prof-face">
+                    <div class="prof-eyes">
+                      <span class="eye left"></span>
+                      <span class="eye right"></span>
+                    </div>
+                    <div class="prof-brows">
+                      <span class="brow left"></span>
+                      <span class="brow right"></span>
+                    </div>
+                    <div class="prof-mouth"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="prof-info">
+                <h3>Prof. Robin</h3>
+                <p class="prof-summary">
+                  Busy, research‑focused, strict but unintentionally funny. Teaches
+                  upper‑year corporate finance and capital markets at HKU Business School.
+                </p>
+                <div class="prof-cv">
+                  <div><strong>Education</strong>: PhD in Finance (LSE), MPhil in Economics (HKU), BBA (Finance) (HKU)</div>
+                  <div>
+                    <strong>Research</strong>: household investment behaviour in Hong Kong, fund flows around
+                    macro‑news, ESG and asset pricing anomalies.
+                  </div>
+                  <div>
+                    <strong>Recent papers</strong>:
+                    “Retail Investors on the Peak Tram”, “Dim Sum Bonds and Local Risk Appetite”,
+                    “When Hallmates Trade Together”.
+                  </div>
+                  <div>
+                    <strong>Office hours</strong>: Tue 15:30‑17:00 @ KKL 1125. Secret weakness: good coffee and
+                    students who actually read his papers.
+                  </div>
+                </div>
+                <ul class="prof-tags">
+                  <li>#KKL1125</li>
+                  <li>#HouseholdFinance</li>
+                  <li>#ESGAnomalies</li>
+                  <li>#MasterApplications</li>
+                </ul>
+              </div>
+            </div>
+          </aside>
+        </main>
+      </section>
+
+      <!-- Ending Screen -->
+      <section id="ending-screen" class="screen">
+        <div class="card ending-card">
+          <h2 id="ending-title">Result</h2>
+          <p id="ending-summary" class="subtitle"></p>
+
+          <div class="ending-meta">
+            <div><strong>Final Favorability:</strong> <span id="final-favorability"></span>/100</div>
+            <div><strong>Outcome:</strong> <span id="final-outcome"></span></div>
+          </div>
+
+          <div id="bonus-opportunity" class="bonus-opportunity hidden"></div>
+
+          <div class="letter-section">
+            <h3>Generated Recommendation Letter</h3>
+            <p class="letter-hint">
+              This is a fictional letter generated based on your conversation with
+              Prof Robin.
+            </p>
+            <textarea id="letter-text" readonly></textarea>
+            <div class="letter-actions">
+              <button id="copy-letter-btn" class="btn secondary">
+                Copy Letter Text
+              </button>
+            </div>
+          </div>
+
+          <div class="ending-footer">
+            <button id="play-again-btn" class="btn primary">
+              Start Another Office Hour
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Simple audio hooks (URLs can be swapped later) -->
+    <audio id="bg-music" loop>
+      <source src="https://upload.wikimedia.org/wikipedia/commons/4/45/Happy_song_instrumental.ogg" type="audio/ogg" />
+    </audio>
+    <audio id="sfx-positive">
+      <source src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Correct_answer_sound_effect.ogg" type="audio/ogg" />
+    </audio>
+    <audio id="sfx-negative">
+      <source src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Error_warning_sound.ogg" type="audio/ogg" />
+    </audio>
+    <audio id="sfx-ending">
+      <source src="https://upload.wikimedia.org/wikipedia/commons/2/21/Closing_door_sound_effect.ogg" type="audio/ogg" />
+    </audio>
+
+    <script src="./main.js"></script>
+  </body>
+</html>
+

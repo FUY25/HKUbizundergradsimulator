@@ -1,0 +1,1717 @@
+/* ============================================
+   PAPER MARIO STYLE - HKU Biz Undergrad Simulator
+   ============================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* Paper Mario Color Palette */
+:root {
+  --paper-cream: #fffef5;
+  --paper-white: #ffffff;
+  --outline-dark: #2d2d2d;
+  --outline-width: 3px;
+  --shadow-offset: 4px;
+  
+  /* Character colors */
+  --student-green: #a8e6cf;
+  --student-green-dark: #88d8b0;
+  --prof-yellow: #ffeaa7;
+  --prof-yellow-dark: #fdcb6e;
+  
+  /* UI colors */
+  --btn-red: #ff6b6b;
+  --btn-red-dark: #ee5a5a;
+  --btn-blue: #74b9ff;
+  --btn-blue-dark: #5ba0e6;
+  --star-gold: #ffd93d;
+  --success-green: #6bcb77;
+  --danger-red: #ee5a5a;
+  
+  /* Paper textures */
+  --paper-shadow: 4px 4px 0 var(--outline-dark);
+  --paper-shadow-small: 3px 3px 0 var(--outline-dark);
+}
+
+body {
+  margin: 0;
+  font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(255, 217, 61, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(116, 185, 255, 0.1) 0%, transparent 50%),
+    linear-gradient(180deg, #fff9e6 0%, #fff5d6 50%, #ffefcc 100%);
+  color: var(--outline-dark);
+  min-height: 100vh;
+}
+
+#app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Decorative stars in background */
+#app::before,
+#app::after {
+  content: "⭐";
+  position: fixed;
+  font-size: 2rem;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: -1;
+  animation: starTwinkle 4s ease-in-out infinite;
+}
+
+#app::before {
+  top: 10%;
+  left: 5%;
+  animation-delay: 0s;
+}
+
+#app::after {
+  bottom: 15%;
+  right: 8%;
+  animation-delay: 2s;
+}
+
+.screen {
+  display: none;
+  opacity: 0;
+}
+
+.screen.active {
+  display: block;
+  opacity: 1;
+  animation: screenFadeIn 0.4s ease-out;
+}
+
+@keyframes screenFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Paper Card - Core Paper Mario element */
+.card {
+  background: var(--paper-cream);
+  border-radius: 16px;
+  border: var(--outline-width) solid var(--outline-dark);
+  box-shadow: 
+    var(--paper-shadow),
+    8px 8px 0 rgba(0, 0, 0, 0.08);
+  padding: 24px 24px 28px;
+  position: relative;
+}
+
+/* Paper Mario Headers - Fredoka font with shadow */
+h1,
+h2,
+h3 {
+  margin: 0 0 8px;
+  font-family: "Fredoka", "Nunito", sans-serif;
+  font-weight: 600;
+  color: var(--outline-dark);
+  text-shadow: 2px 2px 0 var(--star-gold);
+  letter-spacing: 0.5px;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.2rem;
+  text-shadow: 1px 1px 0 var(--star-gold);
+}
+
+.subtitle {
+  margin: 0 0 16px;
+  color: #555;
+  font-weight: 500;
+}
+
+/* Setup Card tape decoration */
+.setup-card {
+  overflow: visible;
+}
+
+.setup-card::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: 30px;
+  width: 60px;
+  height: 20px;
+  background: linear-gradient(180deg, rgba(255, 182, 193, 0.9) 0%, rgba(255, 182, 193, 0.7) 100%);
+  border: 2px solid var(--outline-dark);
+  border-radius: 4px;
+  transform: rotate(3deg);
+  z-index: 10;
+}
+
+/* Intro Card with tape decoration */
+.intro-card {
+  margin-top: 32px;
+  overflow: visible;
+}
+
+/* Tape strip decoration on intro card */
+.intro-card::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 80px;
+  height: 24px;
+  background: linear-gradient(180deg, rgba(135, 206, 235, 0.9) 0%, rgba(135, 206, 235, 0.7) 100%);
+  border: 2px solid var(--outline-dark);
+  border-radius: 4px;
+  z-index: 10;
+}
+
+/* Comic Strip - Paper Mario storybook style */
+.comic-strip {
+  display: grid;
+  gap: 16px;
+  margin: 24px 0 28px;
+}
+
+@media (min-width: 768px) {
+  .comic-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Comic Panels - Rotated paper frames */
+.comic-panel {
+  background: var(--prof-yellow);
+  border-radius: 12px;
+  border: var(--outline-width) solid var(--outline-dark);
+  box-shadow: var(--paper-shadow-small);
+  padding: 16px;
+  position: relative;
+  transform: rotate(var(--panel-rotate, 0deg));
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: panelPopIn 0.5s ease-out backwards;
+  animation-delay: var(--panel-delay, 0s);
+}
+
+.comic-panel:nth-child(1) {
+  --panel-rotate: -1.5deg;
+  --panel-delay: 0.1s;
+}
+
+.comic-panel:nth-child(2) {
+  --panel-rotate: 0.8deg;
+  --panel-delay: 0.25s;
+}
+
+.comic-panel:nth-child(3) {
+  --panel-rotate: -0.5deg;
+  --panel-delay: 0.4s;
+}
+
+.comic-panel:hover {
+  transform: rotate(0deg) scale(1.02);
+  box-shadow: 5px 5px 0 var(--outline-dark);
+  z-index: 5;
+}
+
+/* Pin decoration on comic panels */
+.comic-panel::before {
+  content: "📌";
+  position: absolute;
+  top: -12px;
+  right: 10px;
+  font-size: 1.2rem;
+  filter: drop-shadow(1px 1px 0 var(--outline-dark));
+}
+
+@keyframes panelPopIn {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--panel-rotate, 0deg)) scale(0.8) translateY(20px);
+  }
+  60% {
+    transform: rotate(var(--panel-rotate, 0deg)) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(var(--panel-rotate, 0deg)) scale(1);
+  }
+}
+
+.comic-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Paper Mario Buttons - Bold with press effect */
+.btn {
+  border-radius: 999px;
+  border: var(--outline-width) solid var(--outline-dark);
+  padding: 12px 24px;
+  font-family: "Fredoka", "Nunito", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  position: relative;
+}
+
+.btn.primary {
+  background: linear-gradient(180deg, var(--btn-red) 0%, var(--btn-red-dark) 100%);
+  color: #fff;
+  box-shadow: var(--paper-shadow-small);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.btn.secondary {
+  background: linear-gradient(180deg, var(--paper-white) 0%, #f5f5f0 100%);
+  color: var(--outline-dark);
+  box-shadow: var(--paper-shadow-small);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 0 var(--outline-dark);
+  filter: brightness(1.05);
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--outline-dark);
+}
+
+/* Star decoration on primary button hover */
+.btn.primary::after {
+  content: "★";
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  font-size: 1.2rem;
+  color: var(--star-gold);
+  opacity: 0;
+  transform: scale(0) rotate(-20deg);
+  transition: all 0.2s ease;
+  text-shadow: 1px 1px 0 var(--outline-dark);
+}
+
+.btn.primary:hover::after {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+/* Form Styles - Paper Mario inputs */
+.form-row {
+  margin-bottom: 18px;
+}
+
+.form-row label {
+  display: block;
+  font-family: "Fredoka", "Nunito", sans-serif;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--outline-dark);
+}
+
+.form-row input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: var(--outline-width) solid var(--outline-dark);
+  font-size: 1rem;
+  font-family: "Nunito", sans-serif;
+  background: var(--paper-white);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.form-row input:focus {
+  outline: none;
+  box-shadow: 
+    inset 2px 2px 0 rgba(0, 0, 0, 0.05),
+    0 0 0 3px var(--star-gold);
+  transform: scale(1.01);
+}
+
+.form-row input:disabled {
+  background: #f0f0e8;
+  color: #666;
+}
+
+.form-row.inline {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .form-row.inline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.hint {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 6px;
+  font-style: italic;
+}
+
+.small-print {
+  font-size: 0.85rem;
+  color: #555;
+  background: rgba(255, 217, 61, 0.2);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border-left: 3px solid var(--star-gold);
+}
+
+.form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+  .form-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ============================================
+   GAME LAYOUT - Paper Mario Style
+   ============================================ */
+
+.game-header {
+  display: grid;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+@media (min-width: 900px) {
+  .game-header {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 2fr) auto;
+  }
+}
+
+.title-block h2 {
+  font-size: 1.3rem;
+}
+
+/* Star Power Bar - Paper Mario HP style */
+.favorability-block {
+  background: var(--paper-cream);
+  border-radius: 14px;
+  padding: 12px 14px 14px;
+  border: var(--outline-width) solid var(--outline-dark);
+  box-shadow: var(--paper-shadow-small);
+  position: relative;
+}
+
+/* Star decoration */
+.favorability-block::before {
+  content: "⭐";
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.4rem;
+  filter: drop-shadow(1px 1px 0 var(--outline-dark));
+}
+
+.favorability-label {
+  font-family: "Fredoka", "Nunito", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  color: var(--outline-dark);
+}
+
+#favorability-value {
+  background: var(--star-gold);
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 2px solid var(--outline-dark);
+  font-weight: 700;
+}
+
+.favorability-bar-outer {
+  width: 100%;
+  height: 22px;
+  background: #f5f5f0;
+  border-radius: 999px;
+  border: var(--outline-width) solid var(--outline-dark);
+  overflow: hidden;
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* Star markers at 25, 50, 75 */
+.favorability-bar-outer::before {
+  content: "★ ★ ★";
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  color: rgba(0, 0, 0, 0.15);
+  letter-spacing: 4em;
+  z-index: 1;
+  pointer-events: none;
+}
+
+#favorability-bar-inner {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, 
+    var(--danger-red) 0%, 
+    var(--star-gold) 50%, 
+    var(--success-green) 100%
+  );
+  border-radius: 999px;
+  transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.controls-block {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Paper Mario Toggle Switch */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.toggle input {
+  display: none;
+}
+
+.toggle-slider {
+  width: 44px;
+  height: 24px;
+  background: #e0e0d8;
+  border-radius: 999px;
+  border: 2px solid var(--outline-dark);
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+.toggle-slider::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--paper-white);
+  border: 2px solid var(--outline-dark);
+  top: 1px;
+  left: 1px;
+  transition: transform 0.2s ease;
+}
+
+.toggle input:checked + .toggle-slider {
+  background: var(--student-green);
+}
+
+.toggle input:checked + .toggle-slider::before {
+  transform: translateX(20px);
+}
+
+.toggle-label {
+  color: var(--outline-dark);
+  font-weight: 500;
+}
+
+.screen#game-screen {
+  display: none;
+}
+
+.screen#game-screen.active {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 32px);
+}
+
+.game-main {
+  display: grid;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+@media (min-width: 900px) {
+  .game-main {
+    grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.95fr);
+  }
+}
+
+/* Chat Column - Paper scroll style */
+.chat-column {
+  background: var(--paper-cream);
+  border-radius: 16px;
+  padding: 16px 16px 12px;
+  border: var(--outline-width) solid var(--outline-dark);
+  box-shadow: var(--paper-shadow);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+}
+
+/* Decorative corner fold */
+.chat-column::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 30px 30px;
+  border-color: transparent transparent #e8e8e0 transparent;
+  border-bottom-right-radius: 16px;
+}
+
+.chat-log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 4px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar - Paper Mario style */
+.chat-log::-webkit-scrollbar {
+  width: 12px;
+}
+
+.chat-log::-webkit-scrollbar-track {
+  background: #f0f0e8;
+  border-radius: 6px;
+  border: 2px solid var(--outline-dark);
+}
+
+.chat-log::-webkit-scrollbar-thumb {
+  background: var(--btn-blue);
+  border-radius: 6px;
+  border: 2px solid var(--outline-dark);
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  align-items: center;
+}
+
+.input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.chat-input-row input {
+  width: 100%;
+  border-radius: 999px;
+  border: var(--outline-width) solid var(--outline-dark);
+  padding: 12px 70px 12px 18px;
+  font-size: 1rem;
+  font-family: "Nunito", sans-serif;
+  background: var(--paper-white);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+}
+
+.chat-input-row input:focus {
+  outline: none;
+  box-shadow: 
+    inset 2px 2px 0 rgba(0, 0, 0, 0.05),
+    0 0 0 3px var(--star-gold);
+}
+
+.char-counter {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  font-family: "Fredoka", sans-serif;
+  color: #888;
+  background: var(--paper-cream);
+  padding: 2px 6px;
+  border-radius: 8px;
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.char-counter.warning {
+  color: var(--star-gold);
+}
+
+.char-counter.danger {
+  color: var(--danger-red);
+  font-weight: 600;
+}
+
+.chat-hint {
+  margin: 8px 4px 0;
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* ============================================
+   CHAT BUBBLES - Paper Mario Speech Balloons
+   ============================================ */
+
+.message-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.message-row.student {
+  justify-content: flex-start;
+}
+
+.message-row.prof {
+  justify-content: flex-end;
+}
+
+/* Paper Mario Speech Bubble */
+.bubble {
+  max-width: 75%;
+  padding: 12px 16px 13px;
+  border-radius: 18px;
+  border: var(--outline-width) solid var(--outline-dark);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  position: relative;
+  animation: bubblePopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: var(--paper-shadow-small);
+}
+
+@keyframes bubblePopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+  }
+  60% {
+    transform: scale(1.05) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Student bubble - Green paper */
+.bubble.student {
+  background: linear-gradient(135deg, var(--student-green) 0%, var(--student-green-dark) 100%);
+  border-bottom-left-radius: 6px;
+  margin-left: 8px;
+}
+
+/* Bubble tail for student */
+.bubble.student::before {
+  content: "";
+  position: absolute;
+  bottom: 8px;
+  left: -12px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 12px 8px 0;
+  border-color: transparent var(--outline-dark) transparent transparent;
+}
+
+.bubble.student::after {
+  content: "";
+  position: absolute;
+  bottom: 10px;
+  left: -6px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 10px 6px 0;
+  border-color: transparent var(--student-green) transparent transparent;
+}
+
+/* Prof bubble - Yellow paper */
+.bubble.prof {
+  background: linear-gradient(135deg, var(--prof-yellow) 0%, var(--prof-yellow-dark) 100%);
+  border-bottom-right-radius: 6px;
+  margin-right: 8px;
+}
+
+/* Bubble tail for prof */
+.bubble.prof::before {
+  content: "";
+  position: absolute;
+  bottom: 8px;
+  right: -12px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 0 8px 12px;
+  border-color: transparent transparent transparent var(--outline-dark);
+}
+
+.bubble.prof::after {
+  content: "";
+  position: absolute;
+  bottom: 10px;
+  right: -6px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 0 6px 10px;
+  border-color: transparent transparent transparent var(--prof-yellow);
+}
+
+.bubble-meta {
+  font-size: 0.75rem;
+  color: #555;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* Prof Thought Bubble - Dashed cloud style */
+.prof-thought {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 8px;
+  text-align: right;
+  font-style: italic;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  border: 2px dashed var(--outline-dark);
+  max-width: 85%;
+  margin-left: auto;
+  line-height: 1.5;
+  animation: thoughtBubbleIn 0.5s ease-out;
+  position: relative;
+}
+
+/* Thought bubble dots */
+.prof-thought::after {
+  content: "💭";
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  font-size: 1rem;
+}
+
+@keyframes thoughtBubbleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(-8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ============================================
+   PROFESSOR CARD - Paper Mario Character
+   ============================================ */
+
+.prof-column {
+  display: flex;
+}
+
+.prof-card {
+  background: var(--paper-cream);
+  border-radius: 16px;
+  padding: 16px;
+  border: var(--outline-width) solid var(--outline-dark);
+  box-shadow: var(--paper-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: visible;
+}
+
+/* Name badge decoration */
+.prof-card::before {
+  content: "PROF";
+  position: absolute;
+  top: -12px;
+  right: 16px;
+  background: var(--btn-red);
+  color: white;
+  font-family: "Fredoka", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 2px solid var(--outline-dark);
+  box-shadow: 2px 2px 0 var(--outline-dark);
+}
+
+.prof-avatar-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+/* Paper Cutout Avatar - Paper Mario style */
+.prof-avatar {
+  width: 120px;
+  height: 140px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  animation: paperWobble 4s ease-in-out infinite;
+  filter: drop-shadow(3px 3px 0 var(--outline-dark));
+}
+
+@keyframes paperWobble {
+  0%, 100% { transform: rotate(-1deg); }
+  50% { transform: rotate(1deg); }
+}
+
+/* Professor head/face */
+.prof-face {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #ffe0bd;
+  border: 3px solid var(--outline-dark);
+  position: relative;
+  box-shadow: inset -5px -5px 15px rgba(0,0,0,0.1);
+}
+
+/* Hair on top */
+.prof-face::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70px;
+  height: 30px;
+  background: #4a3728;
+  border: 3px solid var(--outline-dark);
+  border-radius: 50px 50px 0 0;
+  border-bottom: none;
+}
+
+/* Side hair */
+.prof-face::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: -8px;
+  width: 116px;
+  height: 25px;
+  background: #4a3728;
+  border: 3px solid var(--outline-dark);
+  border-radius: 10px;
+  z-index: -1;
+}
+
+.prof-eyes {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 2;
+}
+
+.eye {
+  width: 12px;
+  height: 12px;
+  background: var(--outline-dark);
+  border-radius: 50%;
+  position: relative;
+  animation: eyeBlink 4s infinite;
+  animation-delay: var(--blink-delay, 0s);
+}
+
+.eye.left { --blink-delay: 0s; }
+.eye.right { --blink-delay: 0.1s; }
+
+/* Eye shine */
+.eye::after {
+  content: "";
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  top: 2px;
+  right: 2px;
+}
+
+@keyframes eyeBlink {
+  0%, 45%, 55%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.1); }
+}
+
+.prof-brows {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 65px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 2;
+}
+
+.brow {
+  width: 18px;
+  height: 4px;
+  background: #3b2b19;
+  border-radius: 4px;
+  transition: transform 0.3s ease;
+}
+
+.prof-mouth {
+  position: absolute;
+  bottom: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 10px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  border: 3px solid var(--outline-dark);
+  border-top: none;
+  background: #e88;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.prof-info h3 {
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.prof-info p {
+  font-size: 0.85rem;
+  color: #444;
+}
+
+.prof-summary {
+  margin-bottom: 8px;
+  text-align: center;
+  font-style: italic;
+}
+
+.prof-cv {
+  font-size: 0.8rem;
+  color: #555;
+  display: grid;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  border: 2px dashed #ccc;
+}
+
+.prof-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
+  margin: 8px 0 0;
+  list-style: none;
+  justify-content: center;
+}
+
+.prof-tags li {
+  font-size: 0.75rem;
+  font-family: "Fredoka", sans-serif;
+  background: var(--btn-blue);
+  color: var(--outline-dark);
+  border-radius: 999px;
+  padding: 4px 10px;
+  border: 2px solid var(--outline-dark);
+  box-shadow: 2px 2px 0 var(--outline-dark);
+  transition: transform 0.2s ease;
+}
+
+.prof-tags li:hover {
+  transform: translateY(-2px) rotate(-2deg);
+}
+
+/* ============================================
+   ENDING SCREEN - Paper Mario Victory/Defeat
+   ============================================ */
+
+.ending-card {
+  margin-top: 24px;
+  animation: endingPopUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: visible;
+}
+
+@keyframes endingPopUp {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) rotateX(-10deg);
+  }
+  60% {
+    transform: scale(1.02) rotateX(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotateX(0);
+  }
+}
+
+/* Result banner decoration */
+.ending-card::after {
+  content: "📜";
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.5rem;
+  filter: drop-shadow(2px 2px 0 var(--outline-dark));
+}
+
+.ending-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 16px 0 18px;
+  font-size: 0.95rem;
+}
+
+.ending-meta > div {
+  background: var(--paper-white);
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 2px solid var(--outline-dark);
+  box-shadow: 2px 2px 0 var(--outline-dark);
+}
+
+/* Bonus Opportunity - Star badge style */
+.bonus-opportunity {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #e8ffe8 0%, #d4ffd4 100%);
+  border: var(--outline-width) solid var(--outline-dark);
+  box-shadow: var(--paper-shadow-small);
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+  position: relative;
+  animation: bonusStamp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+}
+
+.bonus-opportunity::before {
+  content: "⭐ BONUS";
+  position: absolute;
+  top: -12px;
+  left: 16px;
+  background: var(--star-gold);
+  color: var(--outline-dark);
+  font-family: "Fredoka", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 2px solid var(--outline-dark);
+}
+
+@keyframes bonusStamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.3) rotate(-5deg);
+  }
+  60% {
+    transform: scale(0.95) rotate(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+.bonus-opportunity.hidden {
+  display: none;
+}
+
+/* Letter Section - Paper scroll style */
+.letter-section {
+  margin-top: 12px;
+}
+
+.letter-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.letter-section h3::before {
+  content: "✉️";
+}
+
+.letter-hint {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 10px;
+  font-style: italic;
+}
+
+#letter-text {
+  width: 100%;
+  max-height: 300px;
+  min-height: 200px;
+  border-radius: 12px;
+  border: var(--outline-width) solid var(--outline-dark);
+  padding: 16px 18px;
+  font-family: "Nunito", serif;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  resize: none;
+  overflow-y: auto;
+  background: 
+    linear-gradient(#e8e8e8 1px, transparent 1px),
+    linear-gradient(var(--paper-cream), var(--paper-cream));
+  background-size: 100% 1.6em, 100% 100%;
+  box-shadow: 
+    inset 3px 3px 0 rgba(0, 0, 0, 0.05),
+    var(--paper-shadow-small);
+  animation: letterUnfold 0.8s ease-out;
+}
+
+@keyframes letterUnfold {
+  0% {
+    opacity: 0;
+    transform: perspective(500px) rotateX(-60deg);
+    transform-origin: top center;
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(500px) rotateX(0);
+  }
+}
+
+.letter-section.hidden {
+  display: none;
+}
+
+.letter-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ending-footer {
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* ============================================
+   UTILITIES & ANIMATIONS
+   ============================================ */
+
+.hidden {
+  display: none;
+}
+
+/* Typing Indicator - Paper Mario style */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--paper-white);
+  border: 2px dashed var(--outline-dark);
+  border-radius: 12px;
+  margin: 8px 0;
+  animation: typingPulse 1.5s ease-in-out infinite;
+}
+
+.typing-indicator.hidden {
+  display: none;
+}
+
+@keyframes typingPulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.typing-bubbles {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-bubbles .dot {
+  width: 10px;
+  height: 10px;
+  background: var(--outline-dark);
+  border-radius: 50%;
+  animation: dotBounce 1.2s ease-in-out infinite;
+}
+
+.typing-bubbles .dot:nth-child(1) { animation-delay: 0s; }
+.typing-bubbles .dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-bubbles .dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-8px); }
+}
+
+.typing-label {
+  font-size: 0.85rem;
+  color: #555;
+  font-style: italic;
+}
+
+/* Favorability Pulse - Star burst effect */
+.favorability-pulse {
+  animation: starPulse 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes starPulse {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+/* ============================================
+   AVATAR MOOD STATES - Paper Mario expressions
+   ============================================ */
+
+/* Happy mood - Big smile */
+.mood-happy .prof-mouth {
+  width: 24px;
+  height: 12px;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  background: #e88;
+  bottom: 22%;
+}
+
+.mood-happy .brow {
+  transform: translateY(-2px);
+}
+
+.mood-happy .prof-avatar {
+  animation: paperWobble 2s ease-in-out infinite, happyBounce 0.6s ease-out;
+}
+
+@keyframes happyBounce {
+  0%, 100% { transform: rotate(-1deg) scale(1); }
+  25% { transform: rotate(1deg) scale(1.05); }
+  50% { transform: rotate(-0.5deg) scale(1); }
+  75% { transform: rotate(0.5deg) scale(1.02); }
+}
+
+/* Neutral mood - Flat line mouth */
+.mood-neutral .prof-mouth {
+  border-radius: 0;
+  border: 3px solid var(--outline-dark);
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  width: 18px;
+  height: 3px;
+  bottom: 28%;
+  background: transparent;
+}
+
+/* Annoyed mood - Frown and furrowed brows */
+.mood-annoyed .prof-mouth {
+  width: 16px;
+  height: 8px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border: 3px solid var(--outline-dark);
+  border-bottom: none;
+  background: transparent;
+  bottom: 26%;
+}
+
+.mood-annoyed .brow.left {
+  transform: translateY(2px) rotate(-15deg);
+}
+
+.mood-annoyed .brow.right {
+  transform: translateY(2px) rotate(15deg);
+}
+
+.mood-annoyed .prof-avatar {
+  animation: paperWobble 4s ease-in-out infinite, annoyedShake 0.4s ease-out;
+}
+
+@keyframes annoyedShake {
+  0%, 100% { transform: rotate(-1deg); }
+  20% { transform: rotate(-3deg); }
+  40% { transform: rotate(2deg); }
+  60% { transform: rotate(-2deg); }
+  80% { transform: rotate(1deg); }
+}
+
+/* Prof card mood animations */
+.prof-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.prof-card.mood-happy {
+  box-shadow: 
+    var(--paper-shadow),
+    0 0 20px rgba(107, 203, 119, 0.3);
+}
+
+.prof-card.mood-annoyed {
+  box-shadow: 
+    var(--paper-shadow),
+    0 0 20px rgba(238, 90, 90, 0.3);
+}
+
+/* ============================================
+   SCREEN TRANSITIONS - Pop-up book style
+   ============================================ */
+
+/* Special entrance for intro screen */
+#intro-screen.active {
+  animation: pageFlipIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes pageFlipIn {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) rotateY(-30deg) scale(0.9);
+    transform-origin: left center;
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) rotateY(0) scale(1);
+  }
+}
+
+/* Game screen special transition */
+#game-screen.active {
+  animation: gameSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes gameSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(30px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* ============================================
+   SOUND TOGGLE BUTTON - Star style
+   ============================================ */
+
+.sound-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: var(--outline-width) solid var(--outline-dark);
+  background: var(--star-gold);
+  box-shadow: var(--paper-shadow-small);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+}
+
+.sound-btn:hover {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.sound-btn:active {
+  transform: scale(0.95) translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--outline-dark);
+}
+
+.sound-btn.muted {
+  background: #e0e0d8;
+}
+
+.sound-btn.muted .sound-icon {
+  opacity: 0.5;
+}
+
+.sound-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+/* Delta badge for favorability changes */
+.delta-badge {
+  position: absolute;
+  font-family: "Fredoka", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  pointer-events: none;
+  animation: deltaFloat 1.2s ease-out forwards;
+  z-index: 100;
+  text-shadow: 
+    1px 1px 0 var(--outline-dark),
+    -1px -1px 0 var(--outline-dark),
+    1px -1px 0 var(--outline-dark),
+    -1px 1px 0 var(--outline-dark);
+}
+
+.delta-badge.positive {
+  color: var(--success-green);
+}
+
+.delta-badge.negative {
+  color: var(--danger-red);
+}
+
+@keyframes deltaFloat {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1.2);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-30px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.8);
+  }
+}
+
+/* Star decorations for background */
+.star-decoration {
+  position: fixed;
+  font-size: 1.5rem;
+  opacity: 0.15;
+  pointer-events: none;
+  animation: starTwinkle 3s ease-in-out infinite;
+  z-index: -1;
+}
+
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0.1; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.25; transform: scale(1.1) rotate(10deg); }
+}
+
+/* Paper confetti for celebrations */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.confetti {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--star-gold);
+  border: 2px solid var(--outline-dark);
+  animation: confettiFall 3s ease-out forwards;
+}
+
+.confetti:nth-child(odd) {
+  background: var(--btn-red);
+  border-radius: 50%;
+}
+
+.confetti:nth-child(3n) {
+  background: var(--btn-blue);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.confetti:nth-child(4n) {
+  background: var(--success-green);
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* End conversation overlay */
+.end-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 248, 220, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: overlayFadeIn 0.5s ease-out;
+  border-radius: 16px;
+}
+
+.end-overlay.hidden {
+  display: none;
+}
+
+@keyframes overlayFadeIn {
+  0% {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+  }
+}
+
+.end-overlay-content {
+  text-align: center;
+  padding: 40px;
+  background: var(--paper-cream);
+  border: var(--outline-width) solid var(--outline-dark);
+  border-radius: 20px;
+  box-shadow: 
+    var(--paper-shadow),
+    0 0 0 8px var(--star-gold),
+    0 0 0 12px var(--outline-dark);
+  animation: endCardBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  max-width: 400px;
+}
+
+@keyframes endCardBounce {
+  0% {
+    transform: scale(0.3) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.end-overlay-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: iconBounce 1s ease-in-out infinite;
+}
+
+@keyframes iconBounce {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+.end-overlay-title {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--outline-dark);
+  margin-bottom: 8px;
+  text-shadow: 2px 2px 0 var(--star-gold);
+}
+
+.end-overlay-subtitle {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.end-overlay .btn {
+  font-size: 1.1rem;
+  padding: 14px 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.end-overlay .btn-star {
+  animation: starSpin 2s linear infinite;
+}
+
+@keyframes starSpin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
