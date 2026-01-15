@@ -1,5 +1,5 @@
 // Minimal Node server to serve the HKU Biz Undergrad Simulator
-// and expose the DeepSeek-backed /api-professor endpoint.
+// and expose the DeepSeek-backed /api/professor endpoint.
 //
 // Usage:
 //   (in env file) DEEPSEEK_API_KEY="your-key" node server.js
@@ -10,7 +10,7 @@ import http from "http";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import handler from "./api-professor.js";
+import handler from "./api/professor.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,7 +63,7 @@ function serveStatic(req, res) {
 }
 
 const server = http.createServer((req, res) => {
-  if (req.url === "/api-professor" && req.method === "POST") {
+  if (req.url === "/api/professor" && req.method === "POST") {
     let body = "";
     req.on("data", (chunk) => {
       body += chunk.toString();

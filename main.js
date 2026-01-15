@@ -498,7 +498,7 @@ async function callProfessorAIForTurn(latestUserText) {
     history,
   };
 
-  const res = await fetch("/api-professor", {
+  const res = await fetch("/api/professor", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -767,7 +767,7 @@ async function callProfessorAIForFinal() {
     history,
   };
 
-  const res = await fetch("/api-professor", {
+  const res = await fetch("/api/professor", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
