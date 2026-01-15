@@ -128,8 +128,10 @@
           </div>
           <div class="favorability-block">
             <div class="favorability-label">
-              Professor's Favorability
-              <span id="favorability-value">0</span>/100
+              <span class="favorability-label-text">Professor's Favorability</span>
+              <span class="favorability-score">
+                <span id="favorability-value">0</span><span>/100</span>
+              </span>
             </div>
             <div class="favorability-bar-outer">
               <div id="favorability-bar-inner"></div>
@@ -278,18 +280,25 @@
       </section>
     </div>
 
-    <!-- Simple audio hooks (URLs can be swapped later) -->
+    <!-- Background music - Nintendo school vibe -->
+    <!-- Chat page music: Calm, study-like chiptune -->
     <audio id="bg-music" loop>
-      <source src="https://upload.wikimedia.org/wikipedia/commons/4/45/Happy_song_instrumental.ogg" type="audio/ogg" />
+      <source src="https://cdn.pixabay.com/audio/2022/10/25/audio_582a0e3572.mp3" type="audio/mpeg" />
     </audio>
+    <!-- Result page music: More dramatic/conclusive -->
+    <audio id="bg-music-result" loop>
+      <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_8c6286b3fb.mp3" type="audio/mpeg" />
+    </audio>
+    
+    <!-- Sound effects -->
     <audio id="sfx-positive">
-      <source src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Correct_answer_sound_effect.ogg" type="audio/ogg" />
+      <source src="https://cdn.pixabay.com/audio/2022/03/10/audio_c8c8a73467.mp3" type="audio/mpeg" />
     </audio>
     <audio id="sfx-negative">
-      <source src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Error_warning_sound.ogg" type="audio/ogg" />
+      <source src="https://cdn.pixabay.com/audio/2022/03/10/audio_5fa1fed4b1.mp3" type="audio/mpeg" />
     </audio>
     <audio id="sfx-ending">
-      <source src="https://upload.wikimedia.org/wikipedia/commons/2/21/Closing_door_sound_effect.ogg" type="audio/ogg" />
+      <source src="https://cdn.pixabay.com/audio/2021/08/04/audio_c507a87f78.mp3" type="audio/mpeg" />
     </audio>
 
     <script src="./main.js"></script>

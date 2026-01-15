@@ -37,6 +37,7 @@ const playAgainBtn = document.getElementById("play-again-btn");
 
 // Audio
 const bgMusic = document.getElementById("bg-music");
+const bgMusicResult = document.getElementById("bg-music-result");
 const sfxPositive = document.getElementById("sfx-positive");
 const sfxNegative = document.getElementById("sfx-negative");
 const sfxEnding = document.getElementById("sfx-ending");
@@ -72,7 +73,25 @@ function clamp(value, min, max) {
 function detectLanguageFromText(text) {
   // Basic detection: if contains any CJK characters, treat as Chinese
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
-  return hasChinese ? "zh" : "en";
+  if (!hasChinese) return "en";
+  
+  // Detect Simplified vs Traditional Chinese
+  // Common Simplified-only characters: 说对学这们过会让该还发现动关
+  const simplifiedChars = /[说对学这们过会让该还发现动关习经业务问题时个师实]/;
+  // Common Traditional-only characters: 說對學這們過會讓該還發現動關
+  const traditionalChars = /[說對學這們過會讓該還發現動關習經業務問題時個師實]/;
+  
+  const hasSimplified = simplifiedChars.test(text);
+  const hasTraditional = traditionalChars.test(text);
+  
+  if (hasSimplified && !hasTraditional) return "zh-CN";
+  if (hasTraditional && !hasSimplified) return "zh-TW";
+  // Default to Traditional for HK context if mixed or unclear
+  return "zh-TW";
+}
+
+function isChinese(lang) {
+  return lang === "zh" || lang === "zh-CN" || lang === "zh-TW";
 }
 
 function showDeltaBadge(delta) {
@@ -176,7 +195,7 @@ function createMessageRow({ from, text, thought }) {
   const who =
     from === "student"
       ? studentConfig?.name || "You"
-      : language === "zh"
+      : isChinese(language)
       ? "羅賓教授"
       : "Prof Robin";
   meta.textContent = who;
@@ -209,21 +228,25 @@ function resetGameState() {
 
   // Intro message from professor
   const greeting =
-    language === "zh"
+    isChinese(language)
       ? `（敲門聲）請進。你好，我是羅賓教授。今天辦公時間只有一會，你有什麼事？`
       : `*knock knock* Come in. Hello, I'm Prof Robin. Office hour is short today — what can I help you with?`;
   const thought =
-    language === "zh"
+    isChinese(language)
       ? `希望這位同學不是又臨急臨忙來要推薦信吧。`
       : `Please don't be another last‑minute recommendation letter panic...`;
 
   createMessageRow({ from: "prof", text: greeting, thought });
   history.push({ role: "prof", content: greeting });
 
-  // Start background music if not muted
+  // Stop result music and start game music if not muted
+  bgMusicResult.pause();
+  bgMusicResult.currentTime = 0;
+  
   if (!soundMuted) {
     try {
       bgMusic.volume = 0.4;
+      bgMusic.currentTime = 0;
       bgMusic.play().catch(() => {});
     } catch {
       // ignore
@@ -304,35 +327,35 @@ function getProfessorResponse(userText) {
   let thought = "";
 
   const politeOpening =
-    language === "zh"
+    isChinese(language)
       ? `先自我介紹一下，讓我知道你是哪一位、上過哪一科。`
       : `Let's start with a quick self‑introduction and remind me which course you took with me.`;
 
   if (currentRound === 1 && !features.mentionLetter) {
     // They haven't directly asked for letter yet
     response =
-      language === "zh"
+      isChinese(language)
         ? `好的，同學。${politeOpening}`
         : `Alright. ${politeOpening}`;
     thought =
-      language === "zh"
+      isChinese(language)
         ? `至少有問候，比直接衝進來要推薦信好一點。`
         : `At least they didn't open with "please write me a letter" immediately.`;
-    delta += features.greeting ? 5 : 2;
-    if (features.thanks) delta += 3;
+    delta += features.greeting ? 12 : 5;
+    if (features.thanks) delta += 8;
     return { response, thought, delta };
   }
 
   if (features.nonsense || userText.trim().length === 0) {
     response =
-      language === "zh"
+      isChinese(language)
         ? `嗯？我猜這不是你平時在 tutorial 裡的表現吧。我們試試用完整句子，好嗎？`
         : `Hm? I assume that's not how you wrote answers in my tutorial. Let's try full sentences, shall we?`;
     thought =
-      language === "zh"
+      isChinese(language)
         ? `還以為是 spam bot 進來了。`
         : `For a second I thought a spam bot somehow joined my office hour.`;
-    delta -= 3;
+    delta -= 15;
     return { response, thought, delta };
   }
 
@@ -341,89 +364,89 @@ function getProfessorResponse(userText) {
     const harsh = Math.random() < 0.6;
     if (harsh) {
       response =
-        language === "zh"
+        isChinese(language)
           ? `同學，你說「幾乎每一堂都有來」，但我的出席紀錄好像不是這樣寫的喔。作為金融人，我們對數字應該誠實一點。`
           : `You mentioned you "almost never missed a class", but my attendance sheet tells a very different story. As finance people, we should at least be honest with numbers.`;
       thought =
-        language === "zh"
+        isChinese(language)
           ? `誠信這一關都過不了，寫推薦信有點心虛。`
           : `If we can't clear the honesty bar, it's hard to write a convincing recommendation.`;
-      delta -= 18 + Math.random() * 6;
+      delta -= 25 + Math.random() * 5;
     } else {
       response =
-        language === "zh"
+        isChinese(language)
           ? `哈哈，我知道這門課九點鐘很痛苦，但我們不用把 60% 說成 100%。你可以直接坦白。`
           : `Haha, I know a 9am class is painful, but we don't have to turn 60% into 100%. You can just be frank with me.`;
       thought =
-        language === "zh"
+        isChinese(language)
           ? `至少他/她願意聊，還有得救。`
           : `At least they're still here with some courage left. Could be saved.`;
-      delta -= 8 + Math.random() * 6;
+      delta -= 12 + Math.random() * 8;
     }
     return { response, thought, delta };
   }
 
   // If they clearly mention the letter
   if (features.mentionLetter) {
-    if (language === "zh") {
+    if (isChinese(language)) {
       response = `所以你今天是想談推薦信的事，對吧？在我答應之前，我想先了解幾件事：你在課堂上的表現、你真正想追求的方向，以及為什麼會找到我。可以多說一點嗎？`;
       thought = `又一位為了 exchange 或 IB 而出現的同學，不過至少他/她先講清楚目的。`;
     } else {
       response = `So you're here about a recommendation letter, right? Before I say yes or no, I need to know a few things: how you actually performed in my course, what you're truly aiming for, and why you think I'm the right person to write it. Tell me more.`;
       thought = `Another student chasing exchange or IB, but at least they're being upfront.`;
     }
-    delta += 6;
-    if (features.greeting) delta += 2;
-    if (features.thanks) delta += 2;
+    delta += 10;
+    if (features.greeting) delta += 5;
+    if (features.thanks) delta += 5;
   } else if (features.effort || features.future) {
-    if (language === "zh") {
+    if (isChinese(language)) {
       response = `我欣賞你有認真想過自己的路向。你可以具體一點說，在我的課裡你做過哪一樣令你自己覺得「值得被寫進推薦信」的事嗎？`;
       thought = `有思考未來，不只是「我要高分」，這類學生寫起來比較有故事。`;
     } else {
       response = `I appreciate that you've thought about your path. Can you be concrete: what did you actually do in my course that you feel is "letter‑worthy"?`;
       thought = `At least they're not only here for the grade. Story potential detected.`;
     }
-    delta += 8;
+    delta += 15;
   } else if (features.panic) {
-    if (language === "zh") {
+    if (isChinese(language)) {
       response = `臨急抱佛腳是 HKU 傳統文化之一，不過推薦信這種東西，通常需要時間累積。我想聽聽，你之前有沒有主動參與課堂、問問題、或者跟我談過？`;
       thought = `如果又是「deadline 明天才想起」，那就要看他/她說服力有多強了。`;
     } else {
       response = `Last‑minute panic is a proud HKU tradition, but recommendation letters usually rely on more than panic. Tell me: have you engaged in class, asked questions, or talked to me before this week?`;
       thought = `If this is another "deadline is tomorrow" case, let's see how persuasive they can be.`;
     }
-    delta -= 2;
+    delta -= 8;
   } else if (features.apology) {
-    if (language === "zh") {
+    if (isChinese(language)) {
       response = `知道自己來得晚，已經比很多人有自覺。重點是，你接下來想怎樣令我相信，你值得我花時間幫你寫一封有內容的信？`;
       thought = `有歉意總比理所當然好。看他/她怎樣補救。`;
     } else {
       response = `Recognizing you're a bit late is already more self‑aware than many. The real question is: how will you convince me you're worth the time for a meaningful letter?`;
       thought = `At least there's some humility. Let's see if they can back it up.`;
     }
-    delta += 5;
+    delta += 10;
   } else {
     // Generic but sensible response
-    if (language === "zh") {
+    if (isChinese(language)) {
       response = `好，我大概明白你的情況。不過單靠一句話，很難判斷你是否適合拿到推薦信。你可以舉一兩個在我課堂或 project 裡的具體例子嗎？`;
       thought = `希望不是只在 Canvas 上存在的名字。`;
     } else {
       response = `Alright, I see. But from a couple of sentences it's hard to judge whether you're someone I can genuinely recommend. Could you give me one or two concrete examples from my class or the project?`;
       thought = `I wonder if they existed anywhere beyond the Canvas gradebook.`;
     }
-    delta += 1;
+    delta += 3;
   }
 
-  // Flattery and thanks give small boosts, but not huge
-  if (features.flattery) delta += 4;
-  if (features.thanks) delta += 2;
-  if (features.effort) delta += 3;
+  // Flattery and thanks give boosts
+  if (features.flattery) delta += 8;
+  if (features.thanks) delta += 5;
+  if (features.effort) delta += 7;
 
   // Talking clearly about future postgraduate study goals is usually positive
-  if (features.future) delta += 2;
+  if (features.future) delta += 5;
 
-  // Tiny noise
-  delta += (Math.random() - 0.5) * 2;
+  // Add some variance
+  delta += (Math.random() - 0.5) * 6;
 
   return { response, thought, delta };
 }
@@ -564,7 +587,7 @@ function showEndOverlay() {
   const overlaySubtitle = endOverlay.querySelector(".end-overlay-subtitle");
   const resultsBtn = endOverlay.querySelector("#see-results-btn");
   
-  if (language === "zh") {
+  if (isChinese(language)) {
     overlayTitle.textContent = "Office Hour 結束";
     overlaySubtitle.textContent = "羅賓教授準備好做出決定了...";
     resultsBtn.innerHTML = '<span class="btn-star">⭐</span> 查看結果 <span class="btn-star">⭐</span>';
@@ -610,7 +633,7 @@ function randomBonusOpportunity(outcomeType) {
     `你被邀請做一個關於香港散戶投資行為的小型 RA，這對將來申請研究型或授課型碩士都是一個很好的信號，還有 KKL 免費咖啡。`,
     `學期末時，羅賓教授提名你申請一個與碩士相關的獎學金，並額外寫了一段短評給招生團隊，強調你的進步。`,
   ];
-  const list = language === "zh" ? optionsZh : optionsEn;
+  const list = isChinese(language) ? optionsZh : optionsEn;
   const idx = Math.floor(Math.random() * list.length);
   return list[idx];
 }
@@ -620,17 +643,17 @@ function generateLetter(outcomeType) {
   const gpaStr =
     typeof studentConfig?.gpa === "number"
       ? studentConfig.gpa.toFixed(2)
-      : language === "zh"
+      : isChinese(language)
       ? "約中上水平"
       : "around the upper‑middle range";
   const attStr =
     typeof studentConfig?.attendance === "number"
       ? `${studentConfig.attendance.toFixed(0)}%`
-      : language === "zh"
+      : isChinese(language)
       ? "大約中等"
       : "roughly average";
 
-  if (language === "zh") {
+  if (isChinese(language)) {
     if (outcomeType === "reject") {
       return `致相關人士︰
 
@@ -787,6 +810,37 @@ async function callProfessorAIForFinal() {
 }
 
 function renderEnding(outcomeType, letter) {
+  // Clear loading interval and hide overlay
+  if (endOverlay.dataset.loadingInterval) {
+    clearInterval(parseInt(endOverlay.dataset.loadingInterval));
+    delete endOverlay.dataset.loadingInterval;
+  }
+  endOverlay.classList.add("hidden");
+  
+  // Reset overlay for next time
+  const overlayIcon = endOverlay.querySelector(".end-overlay-icon");
+  const seeResultsBtnEl = document.getElementById("see-results-btn");
+  if (overlayIcon) {
+    overlayIcon.textContent = "📋";
+    overlayIcon.style.animation = "";
+  }
+  if (seeResultsBtnEl) {
+    seeResultsBtnEl.style.display = "";
+  }
+  
+  // Switch to result music
+  if (!soundMuted) {
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+    try {
+      bgMusicResult.volume = 0.4;
+      bgMusicResult.currentTime = 0;
+      bgMusicResult.play().catch(() => {});
+    } catch {
+      // ignore
+    }
+  }
+  
   const letterSection = document.querySelector(".letter-section");
 
   // Trigger celebration or sad effects
@@ -796,7 +850,7 @@ function renderEnding(outcomeType, letter) {
     setTimeout(() => createSadRain(), 300);
   }
 
-  if (language === "zh") {
+  if (isChinese(language)) {
     if (outcomeType === "reject") {
       endingTitle.textContent = "結果：教授拒絕寫推薦信";
       endingSummary.textContent =
@@ -952,21 +1006,21 @@ copyLetterBtn.addEventListener("click", () => {
       .writeText(text)
       .then(() => {
         alert(
-          language === "zh"
+          isChinese(language)
             ? "推薦信內容已複製到剪貼簿。"
             : "Letter text copied to clipboard."
         );
       })
       .catch(() => {
         alert(
-          language === "zh"
+          isChinese(language)
             ? "無法使用剪貼簿功能，請手動複製文字。"
             : "Clipboard is not available. Please copy the text manually."
         );
       });
   } else {
     alert(
-      language === "zh"
+      isChinese(language)
         ? "瀏覽器不支援直接複製，請手動選取文字。"
         : "Your browser does not support direct copying. Please select and copy manually."
     );
@@ -980,7 +1034,40 @@ playAgainBtn.addEventListener("click", () => {
 
 // See results button (end overlay)
 seeResultsBtn.addEventListener("click", () => {
-  endOverlay.classList.add("hidden");
+  // Show loading state in overlay instead of hiding
+  const overlayContent = endOverlay.querySelector(".end-overlay-content");
+  const overlayIcon = endOverlay.querySelector(".end-overlay-icon");
+  const overlayTitle = endOverlay.querySelector(".end-overlay-title");
+  const overlaySubtitle = endOverlay.querySelector(".end-overlay-subtitle");
+  
+  // Update to loading state
+  overlayIcon.textContent = "⏳";
+  overlayIcon.style.animation = "iconSpin 1s linear infinite";
+  seeResultsBtn.style.display = "none";
+  
+  if (isChinese(language)) {
+    overlayTitle.textContent = "正在生成結果...";
+    overlaySubtitle.textContent = "羅賓教授正在撰寫評語...";
+  } else {
+    overlayTitle.textContent = "Generating Results...";
+    overlaySubtitle.textContent = "Prof Robin is writing his assessment...";
+  }
+  
+  // Add loading dots animation
+  let dots = 0;
+  const loadingInterval = setInterval(() => {
+    dots = (dots + 1) % 4;
+    const dotStr = ".".repeat(dots);
+    if (isChinese(language)) {
+      overlaySubtitle.textContent = "羅賓教授正在撰寫評語" + dotStr;
+    } else {
+      overlaySubtitle.textContent = "Prof Robin is writing his assessment" + dotStr;
+    }
+  }, 500);
+  
+  // Store interval to clear later
+  endOverlay.dataset.loadingInterval = loadingInterval;
+  
   endGame();
 });
 
@@ -992,8 +1079,14 @@ soundToggle.addEventListener("click", () => {
   
   if (soundMuted) {
     bgMusic.pause();
+    bgMusicResult.pause();
   } else {
-    bgMusic.play().catch(() => {});
+    // Resume appropriate music based on current screen
+    if (gameOver) {
+      bgMusicResult.play().catch(() => {});
+    } else {
+      bgMusic.play().catch(() => {});
+    }
   }
 });
 
